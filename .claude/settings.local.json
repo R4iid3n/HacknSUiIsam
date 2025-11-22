@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sui move build:*)",
+      "Bash(sui client publish:*)",
+      "Bash(sui client gas:*)",
+      "Bash(sui client:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
