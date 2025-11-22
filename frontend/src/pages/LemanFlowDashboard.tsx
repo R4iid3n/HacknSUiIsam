@@ -151,7 +151,7 @@ export function LemanFlowDashboard() {
         throw new Error(error.error || 'Registration failed');
       }
 
-      const data = await response.json();
+      await response.json();
       toast.success('Passport registered successfully!');
 
       // Refresh passport

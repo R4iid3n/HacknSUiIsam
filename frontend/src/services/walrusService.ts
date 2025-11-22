@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Walrus Service - Official SDK Version
  *

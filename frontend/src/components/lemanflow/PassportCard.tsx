@@ -15,6 +15,7 @@ export interface Attestation {
   missionTitle: string;
   completedAt: number;
   rewardAmount: number;
+  transactionDigest?: string;
 }
 
 interface PassportCardProps {
@@ -76,7 +77,7 @@ export function PassportCard({ passportId, attestations, totalRewards }: Passpor
           <div className="space-y-2">
             <div className="text-sm font-medium">Recent Achievements</div>
             <div className="space-y-2">
-              {attestations.slice(0, 3).map((att, idx) => (
+              {attestations.slice(0, 3).map((att) => (
                 <div
                   key={`${att.eventId}-${att.missionId}`}
                   className="flex items-start justify-between gap-2 p-2 rounded-lg bg-background/50"
