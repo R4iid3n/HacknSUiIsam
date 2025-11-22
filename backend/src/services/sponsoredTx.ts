@@ -120,8 +120,8 @@ export class SponsoredTransactionService {
       return {
         digest: result.digest,
         effects: result.effects,
-        objectChanges: result.objectChanges,
-        events: result.events,
+        objectChanges: result.objectChanges || undefined,
+        events: result.events || undefined,
       };
     } catch (error) {
       console.error('Fully sponsored transaction failed:', error);

@@ -4,14 +4,14 @@ import { getSession } from './auth.js';
 import { generateMissionQR, verifyQRToken } from '../services/qrService.js';
 import { getSuiClient, getDynamicFields, getDynamicFieldObject } from '../services/suiClient.js';
 import type { AppConfig } from '../config.js';
-import type { SponsoredTransactionService } from '../services/sponsoredTx.js';
+import type { SponsoredTransactionService, MockSponsoredTransactionService } from '../services/sponsoredTx.js';
 import type { BackendWalrusService } from '../services/walrusService.js';
 import type { SuiNSService } from '../services/suinsService.js';
 
 export async function missionRoutes(
   fastify: FastifyInstance,
   config: AppConfig,
-  sponsorTxService: SponsoredTransactionService,
+  sponsorTxService: SponsoredTransactionService | MockSponsoredTransactionService,
   walrusService?: BackendWalrusService,
   suinsService?: SuiNSService
 ) {

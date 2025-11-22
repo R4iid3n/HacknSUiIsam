@@ -2,15 +2,15 @@ import type { FastifyInstance } from 'fastify';
 import { Transaction } from '@mysten/sui/transactions';
 import { getSession } from './auth.js';
 import type { AppConfig } from '../config.js';
-import type { SponsoredTransactionService } from '../services/sponsoredTx.js';
+import type { SponsoredTransactionService, MockSponsoredTransactionService } from '../services/sponsoredTx.js';
 
 export async function adminRoutes(
   fastify: FastifyInstance,
   config: AppConfig,
-  sponsorTxService: SponsoredTransactionService
-) {
+  sponsorTxService: SponsoredTransactionService | MockSponsoredTransactionService,
   walrusService?: any,
   suinsService?: any
+) {
   /**
    * POST /api/admin/init
    * Initialize a new event with grant pool

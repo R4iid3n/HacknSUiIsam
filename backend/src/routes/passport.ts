@@ -4,13 +4,13 @@ import { getSession } from './auth.js';
 import { verifyQRToken } from '../services/qrService.js';
 import { getSuiClient } from '../services/suiClient.js';
 import type { AppConfig } from '../config.js';
-import type { SponsoredTransactionService } from '../services/sponsoredTx.js';
+import type { SponsoredTransactionService, MockSponsoredTransactionService } from '../services/sponsoredTx.js';
 
 export async function passportRoutes(
   fastify: FastifyInstance,
   config: AppConfig,
+  sponsorTxService: SponsoredTransactionService | MockSponsoredTransactionService,
   walrusService?: any
-  sponsorTxService: SponsoredTransactionService
 ) {
   /**
    * GET /api/passport

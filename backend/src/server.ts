@@ -14,6 +14,7 @@ import { authRoutes } from './routes/auth.js';
 import { missionRoutes } from './routes/missions.js';
 import { passportRoutes } from './routes/passport.js';
 import { adminRoutes } from './routes/admin.js';
+import { eventRoutes } from './routes/events.js';
 
 async function start() {
   const fastify = Fastify({
@@ -90,6 +91,7 @@ async function start() {
   console.log('🛣️  Registering routes...');
 
   await authRoutes(fastify, config, enokiService);
+  await eventRoutes(fastify, config, suinsService);
   await missionRoutes(fastify, config, sponsorTxService, walrusService, suinsService);
   await passportRoutes(fastify, config, sponsorTxService, walrusService);
   await adminRoutes(fastify, config, sponsorTxService, walrusService, suinsService);
@@ -122,7 +124,12 @@ async function start() {
           'POST /api/login',
           'POST /api/login/wallet',
           'GET /api/session',
+          'GET /api/me',
           'POST /api/logout',
+        ],
+        events: [
+          'GET /api/events',
+          'GET /api/events/:id',
         ],
         missions: [
           'GET /api/missions?eventId=<id>',

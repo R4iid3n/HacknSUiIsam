@@ -63,7 +63,7 @@ export class EnokiService {
         throw new Error(`Enoki verification failed: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
 
       // Extract user info
       const session: UserSession = {
@@ -105,7 +105,7 @@ export class EnokiService {
         throw new Error('Nonce generation failed');
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       return data.nonce;
     } catch (error) {
       console.error('❌ Enoki nonce generation failed:', error);
@@ -139,7 +139,7 @@ export class EnokiService {
         throw new Error('OAuth URL generation failed');
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       return data.url;
     } catch (error) {
       console.error('❌ Enoki OAuth URL generation failed:', error);

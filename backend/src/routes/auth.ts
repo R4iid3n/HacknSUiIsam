@@ -134,6 +134,48 @@ export async function authRoutes(fastify: FastifyInstance, config: AppConfig, en
   });
 
   /**
+   * GET /api/me
+   * Get current user profile (alias for /api/session)
+   * MODULE 6 compliance endpoint
+   */
+  fastify.get('/api/me', async (request, reply) => {
+    try {
+      const sessionCookie = request.cookies.lemanflow_session;
+
+      if (!sessionCookie) {
+        return reply.code(401).send({
+          error: 'No session found',
+        });
+      }
+
+      const session: UserSession = JSON.parse(sessionCookie);
+
+      // Check if session expired
+      const age = Date.now() - session.createdAt;
+      if (age > config.sessionMaxAge) {
+        reply.clearCookie('lemanflow_session');
+        return reply.code(401).send({
+          error: 'Session expired',
+        });
+      }
+
+      return {
+        user: {
+          address: session.address,
+          provider: session.provider,
+          email: session.email,
+          name: session.name,
+        },
+      };
+    } catch (error: any) {
+      console.error('Session error:', error);
+      return reply.code(401).send({
+        error: 'Invalid session',
+      });
+    }
+  });
+
+  /**
    * POST /api/logout
    * Logout and clear session
    */
