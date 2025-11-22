@@ -73,15 +73,27 @@ export const config: AppConfig = {
   sessionMaxAge: parseInt(process.env.SESSION_MAX_AGE || '86400000', 10), // 24h default
 
   // Mock mode
-  mockMode: process.env.MOCK_MODE === 'true' || !process.env.SPONSOR_PRIVATE_KEY,
+  mockMode: process.env.MOCK_MODE === 'true',
 };
 
-// Validation
+// Validation: Force mock mode if no sponsor key (unless explicitly disabled)
+if (!config.sponsorPrivateKey && config.mockMode !== false) {
+  if (process.env.MOCK_MODE !== 'false') {
+    console.warn(
+      '⚠️  SPONSOR_PRIVATE_KEY not set - running in MOCK mode (no blockchain transactions)'
+    );
+    console.warn('   To use blockchain, set SPONSOR_PRIVATE_KEY in .env');
+    config.mockMode = true;
+  }
+}
+
+// Error if trying to use blockchain without sponsor key
 if (!config.mockMode && !config.sponsorPrivateKey) {
-  console.warn(
-    '⚠️  SPONSOR_PRIVATE_KEY not set - running in MOCK mode (no blockchain transactions)'
-  );
-  config.mockMode = true;
+  console.error('❌ ERROR: MOCK_MODE=false but SPONSOR_PRIVATE_KEY is not set!');
+  console.error('   Either:');
+  console.error('   1. Set SPONSOR_PRIVATE_KEY in .env for blockchain mode');
+  console.error('   2. Set MOCK_MODE=true for development without blockchain');
+  process.exit(1);
 }
 
 if (!config.mockMode && config.packageId === '0x0') {

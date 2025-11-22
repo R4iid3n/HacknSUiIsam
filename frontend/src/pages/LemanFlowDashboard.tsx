@@ -8,8 +8,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import toast from 'react-hot-toast';
 import { Wallet, AlertCircle, Loader2, Info } from 'lucide-react';
 
-const API_BASE = 'http://localhost:4000';
-const DEFAULT_EVENT_ID = '0xe13b43211fca648ff5a3198b3282d15a3c9c976ed922d418231f76680755710d'; // Real event ID
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
+const DEFAULT_EVENT_ID = import.meta.env.VITE_EVENT_ID || '0xe13b43211fca648ff5a3198b3282d15a3c9c976ed922d418231f76680755710d'; // Real event ID
 
 interface PassportData {
   hasPassport: boolean;

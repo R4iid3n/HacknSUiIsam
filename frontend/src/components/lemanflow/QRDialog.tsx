@@ -32,9 +32,11 @@ export function QRDialog({ open, onClose, eventId, missionId, missionTitle }: QR
     setLoading(true);
     setError(null);
 
+    const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
+
     try {
       const response = await fetch(
-        `http://localhost:4000/api/missions/${missionId}/qr?eventId=${eventId}`
+        `${API_BASE}/api/missions/${missionId}/qr?eventId=${eventId}`
       );
 
       if (!response.ok) {
