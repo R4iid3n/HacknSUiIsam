@@ -9,6 +9,8 @@ export async function adminRoutes(
   config: AppConfig,
   sponsorTxService: SponsoredTransactionService
 ) {
+  walrusService?: any,
+  suinsService?: any
   /**
    * POST /api/admin/init
    * Initialize a new event with grant pool

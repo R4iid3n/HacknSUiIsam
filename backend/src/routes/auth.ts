@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { verifyZkLogin, type ZkLoginPayload, type UserSession } from '../services/zkLogin.js';
 import type { AppConfig } from '../config.js';
 
-export async function authRoutes(fastify: FastifyInstance, config: AppConfig) {
+export async function authRoutes(fastify: FastifyInstance, config: AppConfig, enokiService?: any) {
   /**
    * POST /api/login
    * Login with zkLogin (Google, GitHub, etc.)

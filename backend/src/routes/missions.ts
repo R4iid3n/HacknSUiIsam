@@ -5,11 +5,15 @@ import { generateMissionQR, verifyQRToken } from '../services/qrService.js';
 import { getSuiClient, getDynamicFields, getDynamicFieldObject } from '../services/suiClient.js';
 import type { AppConfig } from '../config.js';
 import type { SponsoredTransactionService } from '../services/sponsoredTx.js';
+import type { BackendWalrusService } from '../services/walrusService.js';
+import type { SuiNSService } from '../services/suinsService.js';
 
 export async function missionRoutes(
   fastify: FastifyInstance,
   config: AppConfig,
-  sponsorTxService: SponsoredTransactionService
+  sponsorTxService: SponsoredTransactionService,
+  walrusService?: BackendWalrusService,
+  suinsService?: SuiNSService
 ) {
   /**
    * GET /api/missions?eventId=<id>
@@ -115,13 +119,20 @@ export async function missionRoutes(
         return reply.code(400).send({ error: 'eventId required' });
       }
 
-      // Generate signed QR code
-      const qrData = await generateMissionQR(eventId, parseInt(missionId, 10), config);
+      // Generate signed QR code with Walrus storage
+      const qrData = await generateMissionQR(
+        eventId,
+        parseInt(missionId, 10),
+        config,
+        walrusService,
+        `Mission ${missionId}`
+      );
 
       return {
         token: qrData.token,
         qrDataUrl: qrData.qrDataUrl,
         payload: qrData.payload,
+        walrusBlobId: qrData.walrusBlobId, // Include Walrus blob ID if stored
       };
     } catch (error: any) {
       console.error('Failed to generate QR:', error);

@@ -9,6 +9,7 @@ import type { SponsoredTransactionService } from '../services/sponsoredTx.js';
 export async function passportRoutes(
   fastify: FastifyInstance,
   config: AppConfig,
+  walrusService?: any
   sponsorTxService: SponsoredTransactionService
 ) {
   /**

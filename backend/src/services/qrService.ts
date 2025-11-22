@@ -1,12 +1,14 @@
 import jwt from 'jsonwebtoken';
 import QRCode from 'qrcode';
 import type { AppConfig } from '../config.js';
+import type { BackendWalrusService } from './walrusService.js';
 
 export interface QRPayload {
   eventId: string;
   missionId: number;
   nonce: string;
   timestamp: number;
+  walrusBlobId?: string; // Walrus integration
 }
 
 export interface QRVerificationResult {
@@ -32,17 +34,23 @@ setInterval(() => {
 
 /**
  * Generate a signed QR code payload for a mission
+ * With Walrus integration for decentralized storage
  */
 export async function generateMissionQR(
   eventId: string,
   missionId: number,
-  config: AppConfig
-): Promise<{ token: string; qrDataUrl: string; payload: QRPayload }> {
+  config: AppConfig,
+  walrusService?: BackendWalrusService,
+  missionTitle?: string
+): Promise<{ token: string; qrDataUrl: string; payload: QRPayload; walrusBlobId?: string }> {
+  const timestamp = Date.now();
+  const nonce = `${timestamp}-${Math.random().toString(36).substring(2, 15)}`;
+
   const payload: QRPayload = {
     eventId,
     missionId,
-    nonce: `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-    timestamp: Date.now(),
+    nonce,
+    timestamp,
   };
 
   // Sign the payload
@@ -60,7 +68,28 @@ export async function generateMissionQR(
     margin: 2,
   });
 
-  return { token, qrDataUrl, payload };
+  // WALRUS INTEGRATION: Store QR metadata on Walrus
+  let walrusBlobId: string | undefined;
+  if (walrusService && walrusService.isEnabled()) {
+    try {
+      walrusBlobId = await walrusService.storeQRMetadata({
+        eventId,
+        missionId,
+        title: missionTitle || `Mission ${missionId}`,
+        timestamp,
+        signature: token.split('.')[2], // JWT signature part
+      }) || undefined;
+
+      if (walrusBlobId) {
+        payload.walrusBlobId = walrusBlobId;
+        console.log(`✅ QR metadata stored on Walrus: ${walrusBlobId}`);
+      }
+    } catch (error) {
+      console.warn('⚠️  Failed to store QR on Walrus, continuing without it:', error);
+    }
+  }
+
+  return { token, qrDataUrl, payload, walrusBlobId };
 }
 
 /**

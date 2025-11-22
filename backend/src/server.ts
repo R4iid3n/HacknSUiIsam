@@ -7,6 +7,9 @@ import {
   SponsoredTransactionService,
   MockSponsoredTransactionService,
 } from './services/sponsoredTx.js';
+import { BackendWalrusService } from './services/walrusService.js';
+import { EnokiService } from './services/enokiService.js';
+import { SuiNSService } from './services/suinsService.js';
 import { authRoutes } from './routes/auth.js';
 import { missionRoutes } from './routes/missions.js';
 import { passportRoutes } from './routes/passport.js';
@@ -40,6 +43,7 @@ async function start() {
 
   // Initialize services
   console.log('🔧 Initializing services...');
+  console.log('');
 
   const suiClient = initializeSuiClient(config);
 
@@ -62,13 +66,33 @@ async function start() {
     }
   }
 
+  // SUI Features Integration
+  console.log('');
+  console.log('🌟 Initializing SUI Features...');
+
+  // Walrus - Decentralized Storage
+  const walrusService = new BackendWalrusService(config);
+
+  // Enoki - Managed zkLogin
+  const enokiService = new EnokiService(config);
+
+  // SuiNS - Name Service
+  const suinsService = new SuiNSService(config, suiClient);
+
+  console.log('');
+  console.log('✅ SUI Features initialized:');
+  console.log(`   - Walrus: ${walrusService.isEnabled() ? 'ENABLED' : 'disabled'}`);
+  console.log(`   - Enoki: ${enokiService.isEnabled() ? 'ENABLED' : 'disabled (using fallback zkLogin)'}`);
+  console.log(`   - SuiNS: ${suinsService.isEnabled() ? 'ENABLED' : 'disabled'}`);
+  console.log('');
+
   // Register routes
   console.log('🛣️  Registering routes...');
 
-  await authRoutes(fastify, config);
-  await missionRoutes(fastify, config, sponsorTxService);
-  await passportRoutes(fastify, config, sponsorTxService);
-  await adminRoutes(fastify, config, sponsorTxService);
+  await authRoutes(fastify, config, enokiService);
+  await missionRoutes(fastify, config, sponsorTxService, walrusService, suinsService);
+  await passportRoutes(fastify, config, sponsorTxService, walrusService);
+  await adminRoutes(fastify, config, sponsorTxService, walrusService, suinsService);
 
   // Health check
   fastify.get('/health', async () => {
@@ -78,6 +102,11 @@ async function start() {
       network: config.suiNetwork,
       packageId: config.packageId,
       timestamp: Date.now(),
+      features: {
+        walrus: walrusService.isEnabled(),
+        enoki: enokiService.isEnabled(),
+        suins: suinsService.isEnabled(),
+      },
     };
   });
 
