@@ -17,6 +17,7 @@ import { LemanFlowDashboard } from './pages/LemanFlowDashboard';
 import { ScanPage } from './pages/ScanPage';
 import { PassportPage } from './pages/PassportPage';
 import { AdminPage } from './pages/AdminPage';
+import { DemoHelperPage } from './pages/DemoHelperPage';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/scan" element={<ScanPage />} />
                     <Route path="/passport" element={<PassportPage />} />
                     <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/demo-helper" element={<DemoHelperPage />} />
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                   </Routes>
                 </main>

@@ -148,6 +148,67 @@ export function ScanPage() {
     }
   };
 
+  /**
+   * MODULE 8 - Simulate Claim (Fallback for demo)
+   * Generates QR token for first available mission and auto-claims
+   */
+  const handleSimulateClaim = async () => {
+    if (!account) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    setClaiming(true);
+    setResult(null);
+
+    try {
+      // Fetch available missions
+      const missionsResponse = await fetch(
+        `${API_BASE}/api/missions?eventId=${DEFAULT_EVENT_ID}`,
+        { credentials: 'include' }
+      );
+
+      if (!missionsResponse.ok) {
+        throw new Error('Failed to fetch missions');
+      }
+
+      const missionsData = await missionsResponse.json();
+      const availableMissions = missionsData.missions || [];
+
+      if (availableMissions.length === 0) {
+        throw new Error('No missions available');
+      }
+
+      // Get first mission
+      const mission = availableMissions[0];
+
+      // Generate QR token for this mission
+      const qrResponse = await fetch(
+        `${API_BASE}/api/missions/${mission.missionId}/qr?eventId=${DEFAULT_EVENT_ID}`,
+        { credentials: 'include' }
+      );
+
+      if (!qrResponse.ok) {
+        throw new Error('Failed to generate QR token');
+      }
+
+      const qrData = await qrResponse.json();
+
+      // Auto-claim using the generated token
+      await handleClaim(qrData.token);
+
+      toast.success('Simulated QR scan successfully!');
+    } catch (error: any) {
+      console.error('Simulate claim error:', error);
+      setResult({
+        success: false,
+        message: error.message || 'Failed to simulate claim',
+      });
+      toast.error(error.message || 'Failed to simulate claim');
+      setClaiming(false);
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-4xl py-8 px-4">
       {/* Header */}
@@ -196,17 +257,47 @@ export function ScanPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex justify-center gap-4 mb-8">
-        {!scanning ? (
-          <Button size="lg" onClick={startScanning} className="gap-2">
-            <Camera className="h-5 w-5" />
-            Start Scanning
-          </Button>
-        ) : (
-          <Button size="lg" variant="destructive" onClick={stopScanning} className="gap-2">
-            <CameraOff className="h-5 w-5" />
-            Stop Scanning
-          </Button>
+      <div className="flex flex-col items-center gap-4 mb-8">
+        <div className="flex gap-4">
+          {!scanning ? (
+            <Button size="lg" onClick={startScanning} className="gap-2">
+              <Camera className="h-5 w-5" />
+              Start Scanning
+            </Button>
+          ) : (
+            <Button size="lg" variant="destructive" onClick={stopScanning} className="gap-2">
+              <CameraOff className="h-5 w-5" />
+              Stop Scanning
+            </Button>
+          )}
+        </div>
+
+        {/* MODULE 8 - Simulate Claim Button (Demo Fallback) */}
+        {!scanning && !claiming && (
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-2">
+              Camera not working? Use demo mode:
+            </p>
+            <Button
+              onClick={handleSimulateClaim}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={claiming}
+            >
+              {claiming ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  Simulate Claim (Demo)
+                </>
+              )}
+            </Button>
+          </div>
         )}
       </div>
 
