@@ -1,8 +1,22 @@
 # LémanFlow - Gasless Hackathon Rewards Platform
 
-> Automated micro-grants and attestations distribution for tech events on Sui blockchain
+> **Login with Google. Scan QR codes. Earn SUI. Zero gas fees.**
 
-LémanFlow automates the distribution of micro-grants and soulbound attestations (SBTs) at hackathons, conferences, and tech festivals using **gasless transactions** on Sui blockchain. Participants connect via zkLogin (Google, GitHub) or wallet, complete missions by scanning QR codes, and receive instant rewards—all without paying gas fees.
+**LémanFlow** eliminates the friction of blockchain rewards by combining Sui's zkLogin, sponsored transactions, and object model into a seamless Web2-like experience. Participants complete missions, earn instant SUI rewards, and build soulbound credential portfolios—all without wallets, gas fees, or crypto knowledge.
+
+🏆 **Built for Sui Hackathon 2025** | 🚀 **Production-Ready** | 🔗 **8 Sui-Native Features Integrated**
+
+---
+
+## 💡 The Problem
+
+Traditional hackathon rewards require:
+- ❌ Wallet setup (5-10 minutes of friction)
+- ❌ Gas fees (costs more than the reward)
+- ❌ Crypto knowledge (excludes 90% of participants)
+- ❌ Manual payments (hours of organizer work)
+
+**LémanFlow solves this with Sui's unique primitives.**
 
 ## 🌟 Key Features
 
@@ -23,6 +37,31 @@ LémanFlow automates the distribution of micro-grants and soulbound attestations
 - **On-chain visibility**: Transparent grant distribution
 - **Engagement tracking**: Verifiable impact metrics
 - **Blockchain attestations**: Permanent participation records
+
+---
+
+## 🔥 Why Sui?
+
+LémanFlow leverages **8 Sui-native features** that make this impossible on other chains:
+
+1. **zkLogin** - Social login without wallet setup
+2. **Sponsored Transactions** - Organizers pay gas, participants pay nothing
+3. **Dynamic Fields** - Scalable credential storage (O(1) access)
+4. **Object Model** - Type-safe soulbound tokens enforced by Move
+5. **Programmable Transaction Blocks (PTBs)** - Atomic multi-step operations
+6. **Native Randomness** - Fair mission selection (future feature)
+7. **Multisig** - Secure admin operations
+8. **Walrus Storage** - Decentralized QR code and image hosting
+
+**On Ethereum:** Would require EIP-4337 (Account Abstraction) + custom relayer infrastructure + meta-transaction frameworks
+
+**On Solana:** No native zkLogin equivalent, complex fee payer patterns
+
+**On Sui:** Built-in at protocol level, works out of the box ✅
+
+👉 See [`SUI_FEATURES.md`](./SUI_FEATURES.md) and [`NATIVE_FEATURES.md`](./NATIVE_FEATURES.md) for detailed technical breakdown.
+
+---
 
 ## 📁 Project Structure
 
@@ -354,7 +393,53 @@ All API endpoints return mock data, no transactions executed.
 2. Add endpoint in `backend/src/routes/missions.ts`
 3. Update frontend components
 
-## 🔗 Resources
+---
+
+## 📸 Screenshots & Demo
+
+### Live Demo
+
+🎥 **[Watch 2-Minute Demo Video](#)** _(Coming soon)_
+
+🔗 **[Try Live Demo](#)** _(Testnet deployment)_
+
+### Screenshots
+
+_Comprehensive screenshots available in `/screenshots` folder. See [`SCREENSHOT_CHECKLIST.md`](./SCREENSHOT_CHECKLIST.md) for the complete visual guide._
+
+Key screens:
+1. **Landing Page** - Dark hero with zkLogin CTA
+2. **Dashboard** - Available missions with rewards
+3. **QR Scanner** - Real-time camera scanning
+4. **Claim Success** - Transaction confirmation
+5. **Passport** - Soulbound attestation gallery
+6. **Admin Panel** - Event/mission creation
+7. **Sui Explorer** - On-chain proof
+
+---
+
+## 📚 Documentation
+
+### For Judges & Reviewers
+- 📄 **[SUBMISSION.md](./SUBMISSION.md)** - Complete hackathon submission text
+- ❓ **[JUDGE_QA.md](./JUDGE_QA.md)** - Technical Q&A cheat sheet
+- 🎯 **[ELEVATOR_PITCH.md](./ELEVATOR_PITCH.md)** - 30/60/90-second pitches
+- 🔬 **[TECHNICAL_INNOVATION.md](./TECHNICAL_INNOVATION.md)** - Why this is technically impressive
+
+### For Demo Day
+- 🎬 **[DEMO_GUIDE.md](./DEMO_GUIDE.md)** - 60-90 second demo script with fallbacks
+- 🚀 **[Demo Helper Page](http://localhost:5173/demo-helper)** - Pre-demo verification dashboard
+- 📸 **[SCREENSHOT_CHECKLIST.md](./SCREENSHOT_CHECKLIST.md)** - Visual assets guide
+
+### Technical Documentation
+- 🔗 **[SUI_FEATURES.md](./SUI_FEATURES.md)** - All 8 Sui-native features explained
+- 🛠️ **[NATIVE_FEATURES.md](./NATIVE_FEATURES.md)** - Deep-dive integration guide
+- 📦 **[Move Contracts](./move/sources/lemanflow/)** - Fully documented smart contracts
+- 🔌 **[API Routes](./backend/src/routes/)** - Backend implementation
+
+---
+
+## 🔗 External Resources
 
 - [Sui Documentation](https://docs.sui.io/)
 - [Move Language Book](https://move-language.github.io/move/)
