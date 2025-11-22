@@ -92,9 +92,11 @@ module sui_hackathon::mission {
     }
 
     /// Complete mission and distribute reward (sponsored transaction)
+    /// @param user_address: The address of the user who will receive the reward
     public fun complete_mission_and_reward(
         event_obj: &mut Event,
         passport: &mut Passport,
+        user_address: address,
         mission_id: u64,
         qr_proof: vector<u8>, // In real implementation, verify signature
         clock: &Clock,
@@ -132,9 +134,8 @@ module sui_hackathon::mission {
         // Withdraw reward from event grant pool
         let reward = event_module::withdraw_reward(event_obj, reward_amount, ctx);
 
-        // Transfer reward to user
-        let user = tx_context::sender(ctx);
-        transfer::public_transfer(reward, user);
+        // Transfer reward to the user (not the sponsor)
+        transfer::public_transfer(reward, user_address);
 
         // Add attestation to passport
         let timestamp = clock::timestamp_ms(clock);
@@ -158,7 +159,7 @@ module sui_hackathon::mission {
             event_id,
             mission_id,
             passport_id: object::id(passport),
-            user,
+            user: user_address,
             reward_amount,
             timestamp,
         });

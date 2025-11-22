@@ -114,10 +114,13 @@ export async function passportRoutes(
       // Create transaction to register passport
       const tx = new Transaction();
 
-      // Call passport::register_passport
+      // Call passport::register_passport with user address
       tx.moveCall({
         target: `${config.packageId}::passport::register_passport`,
-        arguments: [tx.pure.u64(Date.now())], // clock_timestamp
+        arguments: [
+          tx.pure.address(session.address), // user_address
+          tx.pure.u64(Date.now()),          // clock_timestamp
+        ],
       });
 
       // Execute as sponsored transaction
@@ -212,7 +215,10 @@ export async function passportRoutes(
         const tx = new Transaction();
         tx.moveCall({
           target: `${config.packageId}::passport::register_passport`,
-          arguments: [tx.pure.u64(Date.now())],
+          arguments: [
+            tx.pure.address(session.address), // user_address
+            tx.pure.u64(Date.now()),          // clock_timestamp
+          ],
         });
 
         const registerResult = await sponsorTxService.executeFullySponsoredTransaction(tx);
@@ -243,6 +249,7 @@ export async function passportRoutes(
         arguments: [
           tx.object(eventId), // event
           tx.object(passportId), // passport
+          tx.pure.address(session.address), // user_address
           tx.pure.u64(missionId), // mission_id
           tx.pure.vector('u8', Array.from(Buffer.from(qrToken))), // qr_proof
           tx.object(clockId), // clock

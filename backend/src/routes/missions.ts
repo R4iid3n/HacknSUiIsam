@@ -76,13 +76,16 @@ export async function missionRoutes(
           const missionData = await getDynamicFieldObject(eventId, field.name);
           const content = missionData.data?.content as any;
 
+          // Mission data is nested in fields.value.fields for dynamic fields
+          const missionFields = content.fields.value.fields;
+
           return {
-            missionId: content.fields.mission_id,
-            title: content.fields.title,
-            description: content.fields.description,
-            rewardAmount: content.fields.reward_amount,
-            active: content.fields.active,
-            completions: content.fields.completions,
+            missionId: parseInt(missionFields.mission_id, 10),
+            title: missionFields.title,
+            description: missionFields.description,
+            rewardAmount: parseInt(missionFields.reward_amount, 10),
+            active: missionFields.active,
+            completions: parseInt(missionFields.completions, 10),
           };
         })
       );

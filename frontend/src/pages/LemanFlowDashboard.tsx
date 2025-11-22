@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { Wallet, AlertCircle, Loader2, Info } from 'lucide-react';
 
 const API_BASE = 'http://localhost:4000';
-const DEFAULT_EVENT_ID = '0x1234567890abcdef'; // Mock event ID for demo
+const DEFAULT_EVENT_ID = '0xe13b43211fca648ff5a3198b3282d15a3c9c976ed922d418231f76680755710d'; // Real event ID
 
 interface PassportData {
   hasPassport: boolean;
@@ -24,6 +24,7 @@ export function LemanFlowDashboard() {
   const [passport, setPassport] = useState<PassportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState<number | null>(null);
+  const [isMockMode, setIsMockMode] = useState(false);
   const [qrDialog, setQrDialog] = useState<{
     open: boolean;
     missionId: number;
@@ -37,8 +38,21 @@ export function LemanFlowDashboard() {
   }, [account]);
 
   useEffect(() => {
+    checkBackendMode();
     fetchData();
   }, []);
+
+  const checkBackendMode = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/health`);
+      if (response.ok) {
+        const data = await response.json();
+        setIsMockMode(data.mode !== 'production');
+      }
+    } catch (error) {
+      console.error('Failed to check backend mode:', error);
+    }
+  };
 
   const loginWithWallet = async () => {
     if (!account) return;
@@ -240,14 +254,16 @@ export function LemanFlowDashboard() {
         </p>
       </div>
 
-      {/* Info Alert */}
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Demo Mode:</strong> Backend is running in mock mode. Connect your wallet and
-          click "Claim Reward" to simulate the gasless transaction flow.
-        </AlertDescription>
-      </Alert>
+      {/* Info Alert - Only show if backend is in mock mode */}
+      {isMockMode && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Demo Mode:</strong> Backend is running in mock mode. Connect your wallet and
+            click "Claim Reward" to simulate the gasless transaction flow.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Wallet Connection */}
       {!account && (

@@ -1,0 +1,15 @@
+{
+  "name": "lemanflow-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "create-event": "tsx create-event.ts"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.45.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.3"
+  }
+}

@@ -51,28 +51,30 @@ module sui_hackathon::passport {
     }
 
     /// Register a new passport (one per user)
+    /// @param user_address: The address of the user who will own this passport
+    /// @param clock_timestamp: Current timestamp
     public fun register_passport(
+        user_address: address,
         clock_timestamp: u64,
         ctx: &mut TxContext
     ) {
         let passport_uid = object::new(ctx);
         let passport_id = object::uid_to_inner(&passport_uid);
-        let owner = tx_context::sender(ctx);
 
         let passport = Passport {
             id: passport_uid,
-            owner,
+            owner: user_address,
             created_at: clock_timestamp,
             attestation_count: 0,
         };
 
         event::emit(PassportRegistered {
             passport_id,
-            owner,
+            owner: user_address,
         });
 
-        // Soulbound - transfer to owner, cannot be transferred again
-        transfer::transfer(passport, owner);
+        // Soulbound - transfer to user, cannot be transferred again
+        transfer::transfer(passport, user_address);
     }
 
     /// Add attestation to passport (called by mission module)
@@ -144,6 +146,7 @@ module sui_hackathon::passport {
 
     #[test_only]
     public fun init_for_testing(ctx: &mut TxContext) {
-        register_passport(0, ctx);
+        let user = tx_context::sender(ctx);
+        register_passport(user, 0, ctx);
     }
 }

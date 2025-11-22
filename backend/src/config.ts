@@ -1,6 +1,12 @@
 import { config as dotenvConfig } from 'dotenv';
+import { resolve } from 'path';
 
-dotenvConfig();
+// Load .env from current working directory with override
+const envPath = resolve(process.cwd(), '.env');
+const result = dotenvConfig({ path: envPath, override: true });
+if (result.error) {
+  console.error('❌ Failed to load .env:', result.error);
+}
 
 export interface AppConfig {
   // Server
