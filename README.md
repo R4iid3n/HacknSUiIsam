@@ -1,442 +1,380 @@
-# SUI Hackathon Project 🚀
+# LémanFlow - Gasless Hackathon Rewards Platform
 
-A full-stack decentralized application (dApp) built on the SUI blockchain, featuring Move smart contracts, Walrus decentralized storage, and a modern React frontend.
+> Automated micro-grants and attestations distribution for tech events on Sui blockchain
 
-Based on the **BSA SUI Template 2025** with enhanced features for hackathon development.
+LémanFlow automates the distribution of micro-grants and soulbound attestations (SBTs) at hackathons, conferences, and tech festivals using **gasless transactions** on Sui blockchain. Participants connect via zkLogin (Google, GitHub) or wallet, complete missions by scanning QR codes, and receive instant rewards—all without paying gas fees.
 
-## Project Structure
+## 🌟 Key Features
+
+### For Participants
+- **Zero gas fees**: All transactions sponsored by organizers
+- **No wallet needed**: Login with Google/GitHub via zkLogin
+- **Instant rewards**: Automatic SUI distribution upon mission completion
+- **Soulbound passport**: Immutable proof of participation (NFT)
+- **Web2-like UX**: Familiar onboarding, no seed phrases
+
+### For Organizers
+- **Automated distribution**: No manual payments, instant execution
+- **QR-based verification**: Secure, anti-replay mission validation
+- **Real-time analytics**: Track participation and rewards
+- **Fraud prevention**: Anti-double-claim, timestamps, signatures
+
+### For Sponsors
+- **On-chain visibility**: Transparent grant distribution
+- **Engagement tracking**: Verifiable impact metrics
+- **Blockchain attestations**: Permanent participation records
+
+## 📁 Project Structure
 
 ```
-Hackaton SUI/
-├── move/                   # Move smart contracts
+lemanflow/
+├── move/                          # Sui Move smart contracts
 │   ├── sources/
-│   │   ├── counter.move   # Counter smart contract with events
-│   │   └── example.move   # Example contract template
-│   ├── tests/             # Contract tests
-│   └── Move.toml          # Move package configuration
-├── frontend/              # React frontend application (Vite)
+│   │   ├── lemanflow/
+│   │   │   ├── event.move         # Event management + grant pool
+│   │   │   ├── mission.move       # Mission logic + rewards
+│   │   │   ├── passport.move      # Soulbound passport (SBT)
+│   │   └── counter.move           # Example contract
+│   ├── tests/                     # Move tests
+│   └── Move.toml
+│
+├── backend/                       # Fastify API server
+│   ├── src/
+│   │   ├── routes/
+│   │   │   ├── auth.ts            # zkLogin + wallet auth
+│   │   │   ├── missions.ts        # Mission queries, QR generation
+│   │   │   ├── passport.ts        # Passport registration, claim
+│   │   │   └── admin.ts           # Event/mission creation
+│   │   ├── services/
+│   │   │   ├── sponsoredTx.ts     # Gasless transactions
+│   │   │   ├── zkLogin.ts         # zkLogin verification
+│   │   │   ├── qrService.ts       # QR signing/verification
+│   │   │   └── suiClient.ts       # Sui blockchain client
+│   │   ├── config.ts              # Configuration
+│   │   └── server.ts              # Fastify server
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/                      # React + Vite frontend
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ui/        # Shadcn UI components (Button, Card, Alert)
-│   │   │   └── WalrusUpload.tsx  # Walrus storage upload component
+│   │   │   ├── lemanflow/
+│   │   │   │   ├── MissionCard.tsx
+│   │   │   │   ├── PassportCard.tsx
+│   │   │   │   └── QRDialog.tsx
+│   │   │   └── ui/                # Shadcn UI components
+│   │   ├── pages/
+│   │   │   └── LemanFlowDashboard.tsx
 │   │   ├── services/
-│   │   │   └── walrusService.ts  # Walrus SDK integration
-│   │   ├── lib/
-│   │   │   └── utils.ts   # Utility functions
-│   │   ├── App.tsx        # Main application with navigation
-│   │   ├── config.ts      # Network configuration
-│   │   ├── providers.tsx  # SUI wallet providers
-│   │   └── main.tsx       # Application entry point
+│   │   │   └── walrusService.ts
+│   │   ├── App.tsx
+│   │   └── main.tsx
 │   ├── package.json
 │   └── vite.config.ts
-├── docker-compose.yml     # Docker orchestration
-├── Dockerfile            # Frontend Docker image
-└── package.json          # Root package configuration
+│
+├── scripts/                       # CLI utilities
+│   ├── deploy.sh                  # Deploy Move contracts
+│   ├── init-event.sh              # Initialize event
+│   └── create-mission.sh          # Create mission
+│
+├── .env.example                   # Environment template
+└── README.md
 ```
 
-## Features ✨
+## 🚀 Quick Start
 
-### Smart Contracts (Move)
-- **Counter Contract**: Shared object with increment/set operations
-- **Event Emission**: Track counter changes with timestamps
-- **Owner Capabilities**: Admin-only functions with OwnerCap
-- **Comprehensive Tests**: Full test coverage with test scenarios
+### Prerequisites
 
-### Frontend (React + Vite)
-- **Walrus Storage Integration**: Upload files, text, and JSON to decentralized storage
-- **Modern UI Components**: Shadcn UI components (Button, Card, Alert)
-- **Multi-View Navigation**: Toggle between Counter and Walrus Storage
-- **SUI Wallet Integration**: Seamless wallet connection with @mysten/dapp-kit
-- **Real-time Updates**: Automatic counter refresh after transactions
-- **Transaction History**: Track uploaded files with blob IDs and URLs
+- [Node.js](https://nodejs.org/) v18+
+- [SUI CLI](https://docs.sui.io/build/install)
+- [Docker](https://www.docker.com/) (optional)
 
-### Walrus Decentralized Storage
-- **File Upload**: Upload any file type to Walrus network
-- **Text Upload**: Store text content on-chain
-- **JSON Upload**: Store structured data with validation
-- **10 Epoch Storage**: Files stored for ~30 days on testnet
-- **Explorer Integration**: Direct links to WalrusCan and SuiVision
-
-### Developer Experience
-- **TypeScript**: Full type safety across the stack
-- **TailwindCSS**: Beautiful, customizable styling with dark mode support
-- **Hot Reload**: Fast development with Vite
-- **Docker Support**: Easy deployment with docker-compose
-- **Comprehensive Documentation**: Detailed setup and usage guides
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [SUI CLI](https://docs.sui.io/build/install) installed
-- [Docker](https://www.docker.com/) (optional, for containerized deployment)
-- A SUI wallet (Sui Wallet, Suiet, or Ethos)
-
-## Installation
-
-### 1. Clone and Install Dependencies
+### 1. Install Dependencies
 
 ```bash
-# Install root dependencies
+# Root
 npm install
 
-# Install frontend dependencies
-cd frontend
+# Backend
+cd backend
 npm install
-cd ..
+
+# Frontend
+cd ../frontend
+npm install
 ```
 
-### 2. Configure Environment Variables
+### 2. Deploy Smart Contracts
 
 ```bash
-# Copy the example environment file
+# Use deployment script
+./scripts/deploy.sh
+
+# Or manually
+cd move
+sui client publish --gas-budget 100000000
+```
+
+**Save the Package ID from output!**
+
+### 3. Configure Environment
+
+```bash
+# Copy template
 cp .env.example .env
 
-# Edit .env with your configuration
-# VITE_SUI_NETWORK=testnet
-# VITE_PACKAGE_ID=<your-package-id>
-# VITE_APP_OBJECT_ID=<your-app-object-id>
+# Edit .env and set:
+# - PACKAGE_ID (from deployment)
+# - SPONSOR_PRIVATE_KEY (create with: sui keytool generate ed25519)
+# - SPONSOR_ADDRESS
 ```
 
-## Development
-
-### Build and Deploy Smart Contracts
+### 4. Fund Sponsor Account
 
 ```bash
-# Navigate to the move directory
-cd move
+# Testnet
+sui client faucet
 
-# Build the Move package
-sui move build
-
-# Run tests
-sui move test
-
-# Deploy to testnet
-sui client publish --gas-budget 100000000
-
-# Or deploy to devnet
-sui client publish --gas-budget 100000000 --network devnet
+# Check balance
+sui client balance
 ```
 
-After deployment, note down:
-- **Package ID**: Use this for `VITE_PACKAGE_ID`
-- **App Object ID**: The shared object ID for `VITE_APP_OBJECT_ID`
-
-### Run Frontend Development Server
+### 5. Start Backend
 
 ```bash
-# From the root directory
-npm run dev:frontend
+cd backend
+npm run dev
+```
 
-# Or from the frontend directory
+Server runs on `http://localhost:4000`
+
+### 6. Start Frontend
+
+```bash
 cd frontend
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+Frontend runs on `http://localhost:5173`
 
-### Run Full Stack Development
+## 📡 API Endpoints
+
+### Authentication
+
+- `POST /api/login` - zkLogin (Google/GitHub)
+- `POST /api/login/wallet` - Wallet login
+- `GET /api/session` - Get current session
+- `POST /api/logout` - Logout
+
+### Missions
+
+- `GET /api/missions?eventId=<id>` - List missions
+- `GET /api/missions/:id/qr?eventId=<id>` - Generate QR code
+- `POST /api/scan` - Verify QR code
+
+### Passport
+
+- `GET /api/passport` - Get user passport
+- `POST /api/passport/register` - Register passport (gasless)
+- `POST /api/claim` - Claim mission reward (gasless)
+
+### Admin
+
+- `POST /api/admin/init` - Create event
+- `POST /api/admin/missions` - Create mission
+- `POST /api/admin/fund` - Fund event
+- `GET /api/admin/sponsor/balance` - Check sponsor balance
+
+## 🎯 Usage Flow
+
+### For Organizers
 
 ```bash
-# From the root directory
+# 1. Deploy contracts
+./scripts/deploy.sh
+
+# 2. Create event
+./scripts/init-event.sh
+# -> Save EVENT_ID and ADMIN_CAP_ID
+
+# 3. Create missions
+./scripts/create-mission.sh
+# -> Generates QR codes for each mission
+
+# 4. Print QR codes for venue
+
+# 5. Monitor dashboard
+```
+
+### For Participants
+
+1. Visit event website
+2. Connect wallet OR login with Google/GitHub (zkLogin)
+3. Register passport (one-click, gasless)
+4. Complete missions by scanning QR codes
+5. Receive instant SUI rewards (gasless)
+6. View attestations in passport
+
+## 🔐 Security Features
+
+### Smart Contracts
+
+- **Soulbound tokens**: Passports non-transferable (proof of identity)
+- **Anti-double-claim**: Each mission claimable once per passport
+- **Timestamps**: Event-based validation
+- **Access control**: Admin-only functions (EventAdminCap)
+- **Dynamic fields**: Scalable mission storage
+
+### Backend
+
+- **QR signing**: JWT-signed QR codes with ECDSA
+- **Nonce anti-replay**: Used QR codes invalidated
+- **Session management**: Secure HTTP-only cookies
+- **Sponsored transactions**: Isolated sponsor keypair
+
+## 🧪 Testing
+
+### Move Contracts
+
+```bash
+cd move
+sui move test
+```
+
+### Backend API (Mock Mode)
+
+```bash
+# Set MOCK_MODE=true in .env
+cd backend
 npm run dev
+
+# All endpoints work without blockchain
+curl http://localhost:4000/health
 ```
 
-## Building for Production
-
-### Build Frontend
+### Frontend
 
 ```bash
-npm run build:frontend
+cd frontend
+npm run dev
+
+# Connect wallet or use mock login
 ```
+
+## 📊 Architecture
+
+### Gasless Transactions Flow
+
+```
+User                Backend              Sui Blockchain
+ |                     |                        |
+ |--1. Login---------->|                        |
+ |<---Session----------|                        |
+ |                     |                        |
+ |--2. Claim Mission-->|                        |
+ |                     |--3. Build TX---------->|
+ |                     |    (sponsor signs)     |
+ |                     |<--4. TX Receipt--------|
+ |<---5. Reward--------|                        |
+```
+
+**Key:** Sponsor pays gas, user receives reward directly
+
+### Smart Contract Architecture
+
+```
+Event (shared object)
+├── grant_pool: Balance<SUI>
+├── missions (dynamic fields):
+│   ├── Mission #0
+│   ├── Mission #1
+│   └── Mission #2
+└── EventAdminCap (capability)
+
+Passport (soulbound, owned by user)
+└── attestations (dynamic fields):
+    ├── Attestation(event_id=0x1, mission_id=0)
+    ├── Attestation(event_id=0x1, mission_id=1)
+    └── ...
+```
+
+## 🌐 Deployment
+
+### Production Checklist
+
+- [ ] Deploy contracts to mainnet/testnet
+- [ ] Fund sponsor account (>10 SUI recommended)
+- [ ] Set `MOCK_MODE=false`
+- [ ] Configure OAuth credentials (Google/GitHub)
+- [ ] Set strong secrets (`QR_SECRET`, `SESSION_SECRET`)
+- [ ] Enable HTTPS (nginx reverse proxy)
+- [ ] Set `CORS_ORIGIN` to frontend domain
+- [ ] Monitor sponsor balance
+- [ ] Set up analytics/logging
 
 ### Docker Deployment
 
 ```bash
-# Build and run with docker-compose
-docker-compose up -d
-
-# Stop services
-docker-compose down
-```
-
-The application will be available at `http://localhost:3000`
-
-## Smart Contract Overview
-
-### Main Modules
-
-#### `counter.move`
-
-An advanced counter demonstrating SUI Move best practices:
-
-- **Counter**: Shared object with value and owner tracking
-- **OwnerCap**: Capability for admin-only operations
-- **create()**: Create and share a new counter with OwnerCap
-- **increment()**: Increment counter with Clock for timestamps
-- **set_value()**: Owner-only function to set counter value
-- **freeze_counter()**: Permanently freeze counter (requires OwnerCap)
-- **Events**: EventIncrement and EventCreate for tracking changes
-
-Features:
-- Event emission with timestamps using Clock
-- Owner-based access control
-- Capability-based permissions with OwnerCap
-- Comprehensive getter functions
-
-#### `example.move`
-
-A simple application template demonstrating basic SUI Move concepts:
-
-- **App**: Shared object containing application state
-- **AdminCap**: Admin capability for privileged operations
-- **increment()**: Public function to increment the counter
-- **update_name()**: Admin function to update app name
-
-### Testing Smart Contracts
-
-```bash
-cd move
-sui move build
-sui move test
-```
-
-All tests should pass, covering:
-- Counter creation
-- Increment operations
-- Owner-only set_value
-- Unauthorized access prevention
-
-## Frontend Architecture
-
-### Key Technologies
-
-- **React 18**: Modern React with hooks
-- **TypeScript**: Type-safe development
-- **Vite**: Fast build tool and dev server
-- **TailwindCSS**: Utility-first CSS framework with dark mode
-- **@mysten/dapp-kit**: SUI wallet integration (v0.19.9)
-- **@mysten/sui**: SUI TypeScript SDK (v1.45.0)
-- **@mysten/walrus**: Walrus decentralized storage SDK (v0.8.4)
-- **@mysten/seal**: Seal protocol integration (v0.9.4)
-- **Shadcn UI**: Modern, accessible UI components
-- **React Spinners**: Loading indicators
-
-### Key Components
-
-#### Core Components
-- **Providers**: Wraps app with SUI client, wallet providers, and React Query
-- **App**: Main application with multi-view navigation (Counter/Walrus)
-- **Config**: Network configuration for testnet, devnet, and mainnet
-
-#### UI Components (`components/ui/`)
-- **Button**: Versatile button component with variants (default, outline, destructive, ghost, link)
-- **Card**: Card container with Header, Title, Description, Content, and Footer
-- **Alert**: Alert component for success, error, and info messages
-
-#### Feature Components
-- **WalrusUpload**: Complete Walrus storage interface
-  - File upload with drag-and-drop
-  - Text content upload
-  - JSON data upload with validation
-  - Upload history tracking
-  - Blob ID and URL management
-  - Integration with WalrusCan and SuiVision explorers
-
-### Services
-
-#### `walrusService.ts`
-Wrapper around the official @mysten/walrus SDK:
-- `uploadWithFlow()`: Multi-step upload flow for browser environments
-- `readBlob()`: Read blob data from Walrus
-- `getFiles()`: Retrieve files by ID
-- `downloadAsText()`: Download and parse as text
-- `downloadAsJson()`: Download and parse as JSON
-
-The service uses the WriteFilesFlow pattern to avoid popup blocking:
-1. Encode files
-2. Register blob (sign transaction)
-3. Upload blob data to storage nodes
-4. Certify blob (sign transaction)
-5. Get blob ID for retrieval
-
-## SUI Network Configuration
-
-The application supports multiple SUI networks:
-
-- **Mainnet**: Production network
-- **Testnet**: Testing network (default)
-- **Devnet**: Development network
-
-Switch networks by updating `VITE_SUI_NETWORK` in your `.env` file.
-
-## Common Commands
-
-```bash
-# Install dependencies
-npm install
-
-# Run development servers
-npm run dev
-
-# Build for production
-npm run build
-
-# Deploy to testnet
-npm run deploy:testnet
-
-# Deploy to devnet
-npm run deploy:devnet
-
-# Run with Docker
 docker-compose up -d
 ```
 
-## Getting Testnet SUI Tokens
+Includes: Frontend (nginx) + Backend (Node.js)
 
-To interact with the dApp on testnet, you'll need testnet SUI tokens:
+## 📈 Market & Impact
 
-```bash
-# Request testnet tokens
-sui client faucet
+### Target Market (TAM/SAM)
 
-# Check your balance
-sui client balance
-```
+- **Global hackathon market**: $5.1B (2031 projection)
+- **Hackathon software**: $3.5B (2033)
+- **CAGR**: 15%+
 
-Or use the [SUI Testnet Faucet](https://discord.com/channels/916379725201563759/971488439931392130) on Discord.
+### Use Cases Beyond Hackathons
 
-## Using Walrus Decentralized Storage
+- **Conferences**: Attendance badges, speaker rewards
+- **Festivals**: Volunteer rewards, artist SBTs
+- **Education**: Course completion attestations
+- **Open innovation**: Automated bounties
 
-### What is Walrus?
+## 🛠️ Development
 
-Walrus is a decentralized storage network built on Sui blockchain that provides:
-- **Redundant Storage**: Files stored across multiple nodes
-- **Permanent Accessibility**: Content accessible via blob ID
-- **Epoch-based Duration**: Storage for configurable number of epochs
-- **No Central Point of Failure**: Fully decentralized architecture
+### Mock Mode
 
-### Uploading to Walrus
-
-1. **Navigate to Walrus Storage**: Click the "Walrus Storage" button in the navigation bar
-2. **Connect Wallet**: Ensure your SUI wallet is connected
-3. **Choose Upload Type**:
-   - **File**: Upload any file type (images, documents, etc.)
-   - **Text**: Upload plain text content
-   - **JSON**: Upload and validate JSON data
-
-4. **Upload Process**:
-   - Select or enter your content
-   - Click upload button
-   - Sign two transactions:
-     - Register transaction: Creates blob metadata on-chain
-     - Certify transaction: Certifies the blob after upload
-   - Wait for confirmation
-
-5. **Access Your Files**:
-   - Copy Blob ID for programmatic access
-   - Copy URL for direct browser access
-   - View on WalrusCan explorer
-   - View metadata on SuiVision
-
-### Programmatic Walrus Usage
-
-```typescript
-import { createWalrusService } from '@/services/walrusService'
-
-// Create Walrus service
-const walrus = createWalrusService({
-  network: 'testnet',
-  epochs: 10
-})
-
-// Upload a file
-const flow = walrus.uploadWithFlow([{
-  contents: fileData,
-  identifier: 'myfile.txt',
-  tags: { 'content-type': 'text/plain' }
-}], { epochs: 10, deletable: true })
-
-await flow.encode()
-const registerTx = flow.register({ owner: address, epochs: 10, deletable: true })
-// Sign and execute registerTx
-await flow.upload({ digest })
-const certifyTx = flow.certify()
-// Sign and execute certifyTx
-const files = await flow.listFiles()
-const blobId = files[0]?.blobId
-
-// Read a file
-const data = await walrus.readBlob(blobId)
-```
-
-### Walrus Storage Costs
-
-- **Testnet**: Free for testing (get SUI from faucet)
-- **Storage Duration**: 10 epochs ≈ 30 days on testnet
-- **Mainnet**: Costs based on file size and epoch duration
-
-### Walrus Resources
-
-- [Walrus Documentation](https://docs.walrus.site/)
-- [Walrus SDK](https://sdk.mystenlabs.com/walrus)
-- [WalrusCan Explorer](https://walruscan.com/)
-- [Walrus GitHub](https://github.com/MystenLabs/walrus-docs)
-
-## Troubleshooting
-
-### SUI CLI Issues
+Set `MOCK_MODE=true` for development without blockchain:
 
 ```bash
-# Check SUI CLI version
-sui --version
-
-# Switch to testnet
-sui client switch --env testnet
-
-# Check active address
-sui client active-address
+# .env
+MOCK_MODE=true
 ```
 
-### Frontend Issues
+All API endpoints return mock data, no transactions executed.
 
-```bash
-# Clear node_modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
+### Adding New Mission Types
 
-# Clear Vite cache
-rm -rf node_modules/.vite
-```
+1. Update `mission.move` with new validation logic
+2. Add endpoint in `backend/src/routes/missions.ts`
+3. Update frontend components
 
-## Project Roadmap
+## 🔗 Resources
 
-- [ ] Add more complex smart contract examples
-- [ ] Implement token/NFT functionality
-- [ ] Add transaction history
-- [ ] Improve UI/UX with more components
-- [ ] Add comprehensive test coverage
-- [ ] Deploy to mainnet
-
-## Resources
-
-- [SUI Documentation](https://docs.sui.io/)
+- [Sui Documentation](https://docs.sui.io/)
 - [Move Language Book](https://move-language.github.io/move/)
-- [SUI TypeScript SDK](https://sdk.mystenlabs.com/typescript)
-- [Mysten dApp Kit](https://sdk.mystenlabs.com/dapp-kit)
+- [zkLogin Guide](https://docs.sui.io/build/zk-login)
+- [Sponsored Transactions](https://docs.sui.io/guides/developer/sui-101/sponsored-transactions)
 
-## License
+## 📝 License
 
 MIT
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Open issues or PRs.
 
-## Support
+## 💡 Support
 
-For questions and support, please open an issue in the repository.
+For questions:
+- Open GitHub issue
+- Discord: [SUI Discord](https://discord.gg/sui)
 
 ---
 
-Built with ❤️ for SUI Hackathon
+**Built with ❤️ for SUI Hackathon 2025**
