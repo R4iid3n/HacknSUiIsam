@@ -1,0 +1,189 @@
+import jwt from 'jsonwebtoken';
+import QRCode from 'qrcode';
+import type { AppConfig } from '../config.js';
+import type { BackendWalrusService } from './walrusService.js';
+
+export interface QRPayload {
+  eventId: string;
+  missionId: number;
+  nonce: string;
+  timestamp: number;
+  walrusBlobId?: string; // Walrus integration
+}
+
+export interface QRVerificationResult {
+  valid: boolean;
+  payload?: QRPayload;
+  error?: string;
+}
+
+// Store used nonces to prevent replay attacks
+const usedNonces = new Set<string>();
+
+// Clean up old nonces every hour
+setInterval(() => {
+  const oneHourAgo = Date.now() - 3600000;
+  for (const nonce of usedNonces) {
+    const [timestampStr] = nonce.split('-');
+    const timestamp = parseInt(timestampStr, 10);
+    if (timestamp < oneHourAgo) {
+      usedNonces.delete(nonce);
+    }
+  }
+}, 3600000);
+
+/**
+ * Generate a signed QR code payload for a mission
+ * With Walrus integration for decentralized storage
+ */
+export async function generateMissionQR(
+  eventId: string,
+  missionId: number,
+  config: AppConfig,
+  walrusService?: BackendWalrusService,
+  missionTitle?: string
+): Promise<{ token: string; qrDataUrl: string; payload: QRPayload; walrusBlobId?: string }> {
+  const timestamp = Date.now();
+  const nonce = `${timestamp}-${Math.random().toString(36).substring(2, 15)}`;
+
+  const payload: QRPayload = {
+    eventId,
+    missionId,
+    nonce,
+    timestamp,
+  };
+
+  // Sign the payload
+  const token = jwt.sign(payload, config.qrSecret, {
+    expiresIn: '1h',
+    issuer: 'lemanflow',
+    subject: 'mission-qr',
+  });
+
+  // Generate QR code data URL
+  const qrDataUrl = await QRCode.toDataURL(token, {
+    errorCorrectionLevel: 'H',
+    type: 'image/png',
+    width: 400,
+    margin: 2,
+  });
+
+  // WALRUS INTEGRATION: Store QR metadata on Walrus
+  let walrusBlobId: string | undefined;
+  if (walrusService && walrusService.isEnabled()) {
+    try {
+      walrusBlobId = await walrusService.storeQRMetadata({
+        eventId,
+        missionId,
+        title: missionTitle || `Mission ${missionId}`,
+        timestamp,
+        signature: token.split('.')[2], // JWT signature part
+      }) || undefined;
+
+      if (walrusBlobId) {
+        payload.walrusBlobId = walrusBlobId;
+        console.log(`✅ QR metadata stored on Walrus: ${walrusBlobId}`);
+      }
+    } catch (error) {
+      console.warn('⚠️  Failed to store QR on Walrus, continuing without it:', error);
+    }
+  }
+
+  return { token, qrDataUrl, payload, walrusBlobId };
+}
+
+/**
+ * Verify a QR code token
+ */
+export function verifyQRToken(
+  token: string,
+  config: AppConfig
+): QRVerificationResult {
+  try {
+    // Verify JWT signature and expiration
+    const decoded = jwt.verify(token, config.qrSecret, {
+      issuer: 'lemanflow',
+      subject: 'mission-qr',
+    }) as QRPayload;
+
+    // Check if nonce has been used
+    if (usedNonces.has(decoded.nonce)) {
+      return {
+        valid: false,
+        error: 'QR code already used',
+      };
+    }
+
+    // Check timestamp (must be within 1 hour)
+    const age = Date.now() - decoded.timestamp;
+    if (age > 3600000) {
+      return {
+        valid: false,
+        error: 'QR code expired',
+      };
+    }
+
+    // Mark nonce as used
+    usedNonces.add(decoded.nonce);
+
+    return {
+      valid: true,
+      payload: decoded,
+    };
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return {
+        valid: false,
+        error: 'QR code expired',
+      };
+    }
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return {
+        valid: false,
+        error: 'Invalid QR code',
+      };
+    }
+
+    return {
+      valid: false,
+      error: 'QR verification failed',
+    };
+  }
+}
+
+import { createHash } from 'crypto';
+
+/**
+ * Generate QR code hash for storing in mission
+ * This is the hash that will be stored on-chain
+ * Uses SHA-256 for cryptographic security
+ */
+export function generateQRHash(secret: string): Uint8Array {
+  const hash = createHash('sha256');
+  hash.update(secret);
+  return new Uint8Array(hash.digest());
+}
+
+/**
+ * Verify QR proof matches mission's stored hash
+ */
+export function verifyQRProof(
+  proof: string,
+  storedHash: Uint8Array
+): boolean {
+  const proofHash = generateQRHash(proof);
+
+  // Compare hashes
+  if (proofHash.length !== storedHash.length) {
+    return false;
+  }
+
+  for (let i = 0; i < proofHash.length; i++) {
+    if (proofHash[i] !== storedHash[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}

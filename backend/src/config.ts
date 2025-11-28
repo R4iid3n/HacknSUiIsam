@@ -1,0 +1,107 @@
+import { config as dotenvConfig } from 'dotenv';
+import { resolve } from 'path';
+
+// Load .env from current working directory with override
+const envPath = resolve(process.cwd(), '.env');
+const result = dotenvConfig({ path: envPath, override: true });
+if (result.error) {
+  console.error('❌ Failed to load .env:', result.error);
+}
+
+export interface AppConfig {
+  // Server
+  port: number;
+  host: string;
+  corsOrigin: string;
+
+  // Sui Network
+  suiNetwork: 'mainnet' | 'testnet' | 'devnet' | 'localnet';
+  suiRpcUrl: string;
+
+  // Smart Contracts
+  packageId: string;
+
+  // Sponsor Account (for gasless transactions)
+  sponsorPrivateKey: string;
+  sponsorAddress: string;
+
+  // QR Signing
+  qrSecret: string;
+
+  // zkLogin (OAuth)
+  googleClientId?: string;
+  githubClientId?: string;
+  githubClientSecret?: string;
+
+  // Session
+  sessionSecret: string;
+  sessionMaxAge: number; // milliseconds
+
+  // Mock mode (for development without blockchain)
+  mockMode: boolean;
+}
+
+export const config: AppConfig = {
+  // Server
+  port: parseInt(process.env.PORT || '4000', 10),
+  host: process.env.HOST || '0.0.0.0',
+  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+
+  // Sui Network
+  suiNetwork: (process.env.SUI_NETWORK as any) || 'testnet',
+  suiRpcUrl:
+    process.env.SUI_RPC_URL ||
+    'https://fullnode.testnet.sui.io:443',
+
+  // Smart Contracts
+  packageId: process.env.PACKAGE_ID || '0x0',
+
+  // Sponsor Account (CRITICAL: must be set for gasless transactions)
+  sponsorPrivateKey: process.env.SPONSOR_PRIVATE_KEY || '',
+  sponsorAddress: process.env.SPONSOR_ADDRESS || '',
+
+  // QR Signing
+  qrSecret: process.env.QR_SECRET || 'change-me-in-production',
+
+  // zkLogin
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
+  githubClientId: process.env.GITHUB_CLIENT_ID,
+  githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
+
+  // Session
+  sessionSecret: process.env.SESSION_SECRET || 'change-me-in-production',
+  sessionMaxAge: parseInt(process.env.SESSION_MAX_AGE || '86400000', 10), // 24h default
+
+  // Mock mode
+  mockMode: process.env.MOCK_MODE === 'true',
+};
+
+// Validation: Force mock mode if no sponsor key (unless explicitly disabled)
+if (!config.sponsorPrivateKey && config.mockMode !== false) {
+  if (process.env.MOCK_MODE !== 'false') {
+    console.warn(
+      '⚠️  SPONSOR_PRIVATE_KEY not set - running in MOCK mode (no blockchain transactions)'
+    );
+    console.warn('   To use blockchain, set SPONSOR_PRIVATE_KEY in .env');
+    config.mockMode = true;
+  }
+}
+
+// Error if trying to use blockchain without sponsor key
+if (!config.mockMode && !config.sponsorPrivateKey) {
+  console.error('❌ ERROR: MOCK_MODE=false but SPONSOR_PRIVATE_KEY is not set!');
+  console.error('   Either:');
+  console.error('   1. Set SPONSOR_PRIVATE_KEY in .env for blockchain mode');
+  console.error('   2. Set MOCK_MODE=true for development without blockchain');
+  process.exit(1);
+}
+
+if (!config.mockMode && config.packageId === '0x0') {
+  console.warn('⚠️  PACKAGE_ID not set - please deploy contracts first');
+}
+
+console.log('📋 Configuration loaded:');
+console.log(`   Network: ${config.suiNetwork}`);
+console.log(`   Mock Mode: ${config.mockMode ? 'YES (dev only)' : 'NO (production)'}`);
+console.log(`   Package ID: ${config.packageId.slice(0, 20)}...`);
+console.log(`   Sponsor: ${config.sponsorAddress.slice(0, 20)}...` || 'NOT SET');

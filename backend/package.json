@@ -1,0 +1,41 @@
+{
+  "name": "lemanflow-backend",
+  "version": "1.0.0",
+  "description": "LémanFlow Backend API - Gasless hackathon rewards distribution",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest"
+  },
+  "keywords": [
+    "sui",
+    "blockchain",
+    "hackathon",
+    "gasless",
+    "zklogin"
+  ],
+  "author": "LémanFlow Team",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/cors": "^9.0.1",
+    "@mysten/sui": "^1.45.0",
+    "@mysten/walrus": "^0.8.4",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.26.2",
+    "jsonwebtoken": "^9.0.2",
+    "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.19.25",
+    "@types/qrcode": "^1.5.5",
+    "pino-pretty": "^13.1.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
+  }
+}

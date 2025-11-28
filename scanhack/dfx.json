@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "canisters": {
+    "registry": {
+      "type": "motoko",
+      "main": "canisters/registry/main.mo",
+      "dependencies": []
+    },
+    "missions": {
+      "type": "motoko",
+      "main": "canisters/missions/main.mo",
+      "dependencies": ["registry"]
+    },
+    "grantvault": {
+      "type": "motoko",
+      "main": "canisters/grantvault/main.mo",
+      "dependencies": ["registry", "missions"]
+    },
+    "backend": {
+      "type": "motoko",
+      "main": "backend/main.mo",
+      "dependencies": ["registry", "missions", "grantvault"]
+    },
+    "frontend": {
+      "type": "assets",
+      "source": ["frontend/out"],
+      "dependencies": ["registry", "missions", "grantvault", "backend"]
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "type": "persistent"
+    }
+  }
+}
+
